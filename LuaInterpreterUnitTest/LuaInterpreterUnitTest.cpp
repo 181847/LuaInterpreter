@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include "../../Library/Lua/LuaInterpreter/LuaInterpreter.h"
+#include "../../Library/Lua/LuaModuls/LuaMeshData/LuaMeshDataStruct.h"
 #include "../../Library/MyTools/Formater.h"
 
 #pragma comment(lib, "LuaInterpreter.lib")
@@ -174,15 +175,15 @@ void addTestUnit()
 					switch (keyItg)
 					{
 					case 1:
-						error += 4 == itg;
+						error += 4 != itg;
 						break;
 
 					case 2:
-						error += 5 == itg;
+						error += 5 != itg;
 						break;
 
 					case 3:
-						error += 6 == itg;
+						error += 6 != itg;
 						break;
 					default:
 						++error;
@@ -194,15 +195,15 @@ void addTestUnit()
 				{
 					if (0 == strcmp(keyStr, "a"))
 					{
-						error += 1 == itg;
+						error += 1 != itg;
 					}
 					else if (0 == strcmp(keyStr, "b"))
 					{
-						error += 2 == itg;
+						error += 2 != itg;
 					}
 					else if (0 == strcmp(keyStr, "c"))
 					{
-						error += 3 == itg;
+						error += 3 != itg;
 					}
 					else
 					{
@@ -213,7 +214,43 @@ void addTestUnit()
 	
 			LUA_INTERPRETER_FOREACH_LAMBDA_END
 			);
-		return error;
+		return error == 0;
+	TEST_UNIT_END;
+
+	TEST_UNIT_START("test get userdata")
+		TEST_TARGET->GetGlobal("test_userdata_meshdata");
+		LuaPointerContainer<Lua::MeshData> * pmd = 
+			TEST_TARGET->ToUserDataAndClear<LuaPointerContainer<Lua::MeshData>>(
+				Lua::LuaMeshDataMetatableName);
+		int error = 0;
+		// remind that all the vector here contain a none placeholder
+		// which stand for the meanless component.
+		// so the avalible size should substract one
+		error += 1 != ( pmd->pointer->Positions	.size() - 1 );
+		error += 2 != ( pmd->pointer->Texcoords	.size() - 1 );
+		error += 3 != ( pmd->pointer->Normals	.size() - 1 );
+		error += 4 != ( pmd->pointer->TangentUs	.size() - 1 );
+		error += 5 != ( pmd->pointer->Vertices	.size() - 1 );
+		error += 6 != ( pmd->pointer->Indices32	.size() - 1 );
+		return error == 0;
+	TEST_UNIT_END;
+
+	TEST_UNIT_START("test get userdata inner type")
+		TEST_TARGET->GetGlobal("test_userdata_meshdata");
+		LuaPointerContainer<Lua::MeshData> * pmd = nullptr;
+		TEST_TARGET->ToUserDataAndClear<LuaPointerContainer<Lua::MeshData>>(
+			Lua::LuaMeshDataMetatableName, &pmd);
+		int error = 0;
+		// remind that all the vector here contain a none placeholder
+		// which stand for the meanless component.
+		// so the avalible size should substract one
+		error += 1 != ( pmd->pointer->Positions	.size() - 1 );
+		error += 2 != ( pmd->pointer->Texcoords	.size() - 1 );
+		error += 3 != ( pmd->pointer->Normals	.size() - 1 );
+		error += 4 != ( pmd->pointer->TangentUs	.size() - 1 );
+		error += 5 != ( pmd->pointer->Vertices	.size() - 1 );
+		error += 6 != ( pmd->pointer->Indices32	.size() - 1 );
+		return error == 0;
 	TEST_UNIT_END;
 
 
