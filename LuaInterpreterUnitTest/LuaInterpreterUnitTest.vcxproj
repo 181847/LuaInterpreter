@@ -152,6 +152,7 @@
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="UnitTestModules.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LuaInterpreterUnitTest.cpp" />
