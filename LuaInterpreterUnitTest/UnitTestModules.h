@@ -1,7 +1,13 @@
 #pragma once
 #include <functional>
 #include <string>
+#include <vector>
 #include "../../Library/MyTools/MyAssert.h"
+
+extern std::vector<std::function<bool(std::string& unitName)>> testUnits;
+
+extern unsigned int totalCount;
+extern unsigned int	success;
 
 #define DECLARE_TEST_UNITS\
 	static std::vector<std::function<bool(std::string& unitName)>>\
@@ -25,6 +31,7 @@ namespace TestUnit
 // there is no way to pass arguments between the functions,
 // so just use the global variable.
 void GetReady();
+void AfterTest();
 
 // user should implemment this function
 // to add the test units,
@@ -42,15 +49,46 @@ void GetReady();
 //			return true
 //		TEST_UNIT_END
 void AddTestUnit();
-void RunTest();
-void Summary();
+inline void RunTest()
+{
+	std::string unitName;
+	for (auto & testUnit : testUnits)
+	{
+		bool result = testUnit(unitName);
+		success += result;
+		printf("\t%s\t\t\t%s\n", result ? "success" : "failed", unitName.c_str());
+	}
+}
 
-inline void testMain()
+inline void Summary()
+{
+	totalCount = testUnits.size();
+	printf("Summarize:\n");
+	printf("TestCount\tsuccess\t\tfailed\n");
+	printf("%d\t\t%d\t\t%d\n", totalCount, success, totalCount - success);
+}
+
+inline void execute()
 {
 	GetReady();
 	AddTestUnit();
 	RunTest();
 	Summary();
+	AfterTest();
+}
+
+inline void testMain()
+{
+	try
+	{
+		execute();
+	}
+	catch (SimpleException & e)
+	{
+		fprintf(stderr, "ERROR:%s", e.ToString().c_str());
+	}
+
+	getchar();
 }
 
 }// namespace TestUnit
