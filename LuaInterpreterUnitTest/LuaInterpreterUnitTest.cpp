@@ -14,9 +14,10 @@ static std::vector<
 	bool(Lua::LuaInterpreter* pluainter, std::string& unitName)>>
 	testUnits;
 
-#define TEST_UNIT_LAMBDA_START (Lua::LuaInterpreter* pluainter, std::string& unitName) -> bool {
-#define TEST_UNIT_LAMBDA_END }
-
+// use the next marco to start a test unit,
+// the unit itself is a lambda that will be added to the global vector
+// 'testUntis', the units will be called later.
+// the return value indicate whether the test has been passed.
 #define TEST_UNIT_START(UnitName) testUnits.push_back(std::move(\
 	[](Lua::LuaInterpreter* pluainter, std::string& unitName) -> bool {\
 		unitName = UnitName;
@@ -24,6 +25,7 @@ static std::vector<
 // this macro is only used int the TEST_UNIT_START ~ END
 #define TEST_TARGET pluainter
 
+// end 
 #define TEST_UNIT_END }))
 
 
@@ -82,8 +84,8 @@ void runTest()
 
 void addTestUnit()
 {
-	TEST_UNIT_START("doFile if the doFile is called successful, \
-		you can see this information")
+	TEST_UNIT_START("doFile is called successfully, \
+		if you can see this information")
 		return true;
 	TEST_UNIT_END;
 
@@ -212,8 +214,7 @@ void addTestUnit()
 					DEBUG_MESSAGE("key field: %s\n", keyStr);
 				}
 	
-			LUA_INTERPRETER_FOREACH_LAMBDA_END
-			);
+			}); // end foreach
 		return error == 0;
 	TEST_UNIT_END;
 
