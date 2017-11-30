@@ -202,7 +202,38 @@ void TestUnit::AddTestUnit()
 		return error == 0;
 	TEST_UNIT_END;
 
-	TEST_UNIT_START("test run the lua interpreter")
+	TEST_UNIT_START("test push integer")
+		TEST_TARGET->PushInteger(111);
+		return 111 == TEST_TARGET->ToIntegerAndPop();
+		TEST_UNIT_END;
+
+	TEST_UNIT_START("test push number")
+		TEST_TARGET->PushNumber(2.22);
+		return 10e-8 > (2.22 - TEST_TARGET->ToNumberAndPop());
+	TEST_UNIT_END;
+
+	TEST_UNIT_START("test push integer")
+		const char * pts = "unique_test~!@#$%^&*()\n\t";
+		Formater<256> buffer;
+		TEST_TARGET->PushString(pts);
+		TEST_TARGET->ToStringAndClear<buffer.Size>(buffer.bufferPointer());
+		return 0 == strcmp(pts, buffer.bufferPointer());
+	TEST_UNIT_END;
+
+	TEST_UNIT_START("test get the length of the table")
+		UINT length = TEST_TARGET->GetGlobal("test_table")
+									->LengthOfTop<UINT>();
+		return length == 3;
+	TEST_UNIT_END;
+
+	TEST_UNIT_START("test get the length of the table inner type")
+		UINT length;
+		TEST_TARGET->GetGlobal("test_table")
+						->LengthOfTop(&length);
+		return length == 3;
+	TEST_UNIT_END;
+
+	TEST_UNIT_START("test run the interactive mode")
 		printf("Here have enter the lua interactive mode, please enter the commands to test the interpreter.\n");
 		printf("This unit test will always success\n");
 		TEST_TARGET->Run();
