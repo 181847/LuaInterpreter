@@ -12,6 +12,14 @@ test_ToStringandClear = 'test_string_5'
 
 test_GetGlobal = 6
 
+test_ifelse_true = true
+test_ifelse_nil = nil
+
+test_if_true_then = 123
+test_if_true_else = 456
+test_if_nil_then = 789
+test_if_nil_else = 321
+
 -- use a meshdata to test userdata extract
 md = require("MeshData")
 test_userdata_meshdata = md.new()
