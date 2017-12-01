@@ -116,6 +116,7 @@ void TestUnit::AddTestUnit()
 	TEST_UNIT_START("traverse table")
 		TEST_TARGET->GetGlobal("test_table");
 		int error = 0;
+		int stackSize;
 		TEST_TARGET->Foreach(
 			[&error](LUA_INTERPRETER_FOREACH_LAMBDA_ARGS){
 				// @ pLuaInter
