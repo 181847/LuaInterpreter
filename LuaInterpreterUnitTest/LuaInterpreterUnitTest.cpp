@@ -116,11 +116,14 @@ void TestUnit::AddTestUnit()
 	TEST_UNIT_START("traverse table")
 		TEST_TARGET->GetGlobal("test_table");
 		int error = 0;
-		int stackSize;
+
+		// use the stackSize to trace the stacksize
+		// after the iteration, the stack size should not changed.
+		int stackSize = lua_gettop(TEST_TARGET.get()->m_L);
 		TEST_TARGET->Foreach(
 			[&error](LUA_INTERPRETER_FOREACH_LAMBDA_ARGS){
 				// @ pLuaInter
-				int itg = luaInterForeach->ToIntegerAndPop<int>();
+				int itg = EACH->ToIntegerAndPop<int>();
 				if (keyIsNumber)
 				{
 					switch (keyItg)
@@ -162,14 +165,28 @@ void TestUnit::AddTestUnit()
 					}
 					//DEBUG_MESSAGE("key field: %s\n", keyStr);
 				}
-	
+				// after normal accessing
+				// let's do something unusual,
+				// push another other values into the stack,
+				// make sure that the the foreach loop will
+				// keep the stack as original.
+				EACH->PushInteger(123);
+				EACH->PushNumber(123.4);
+				EACH->PushString("this is a string pushed by unit test which test foreach iteration.");
 			}); // end foreach
+
+		stackSize -= lua_gettop(TEST_TARGET.get()->m_L);
+		error += stackSize != 0;
 		return error == 0;
 	TEST_UNIT_END;
 	
 	TEST_UNIT_START("traverse table use easy marco")
 		TEST_TARGET->GetGlobal("test_table");
 		int error = 0;
+
+		// use the stackSize to trace the stacksize
+		// after the iteration, the stack size should not changed.
+		int stackSize = lua_gettop(TEST_TARGET.get()->m_L);
 		TEST_TARGET->Foreach(
 			FOREACH_START
 				// @ pLuaInter
@@ -214,9 +231,19 @@ void TestUnit::AddTestUnit()
 						++error;
 					}
 					//DEBUG_MESSAGE("key field: %s\n", keyStr);
-				}	
+				}
+				// after normal accessing
+				// let's do something unusual,
+				// push another other values into the stack,
+				// make sure that the the foreach loop will
+				// keep the stack as original.
+				EACH->PushInteger(123);
+				EACH->PushNumber(123.4);
+				EACH->PushString("this is a string pushed by unit test which test foreach iteration.");
 			FOREACH_END
 			); // lua::foreach end
+		stackSize -= lua_gettop(TEST_TARGET.get()->m_L);
+		error += stackSize != 0;
 		return error == 0;
 	TEST_UNIT_END;
 
